@@ -24,13 +24,12 @@ import org.springframework.stereotype.Component;
  * <a href="http://christianposta.com/blog>http://christianposta.com/blog</a>.
  */
 @Component
-public class SampleRoute extends RouteBuilder{
+public class BatchCamelRoute extends RouteBuilder{
     @Override
     public void configure() throws Exception {
         from("file://target/data/input?noop=true&idempotent=true")
                 .log("New file to process ${header.CamelFileName}")
-                .bean(CreateJobParameters.class, "create")
-                .log("Params: ${body}")
+                .setHeader("inputFile", header("CamelFileAbsolutePath"))
                 .to("spring-batch:multilineJob");
     }
 }

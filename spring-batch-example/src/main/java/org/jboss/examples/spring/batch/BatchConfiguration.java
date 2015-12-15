@@ -62,7 +62,7 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Job job(Step step1) throws Exception {
+    public Job multilineJob(Step step1) throws Exception {
         return jobBuilderFactory.get("multilineJob")
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
