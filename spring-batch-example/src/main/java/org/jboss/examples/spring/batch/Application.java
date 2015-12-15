@@ -16,9 +16,12 @@
  */
 package org.jboss.examples.spring.batch;
 
+import org.apache.camel.component.servlet.CamelHttpTransportServlet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,9 +35,21 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 public class Application {
 
+    private static final String CAMEL_URL_MAPPING = "/camel/*";
+    private static final String CAMEL_SERVLET_NAME = "CamelServlet";
+
     public static void main(String[] args) {
         ApplicationContext context = SpringApplication.run(Application.class, args);
     }
 
+    @Bean
+    public ServletRegistrationBean camelServletRegistration() {
+
+        // Create servlet for Camel Rest Endpoints
+        ServletRegistrationBean registration = new ServletRegistrationBean(
+                new CamelHttpTransportServlet(), CAMEL_URL_MAPPING);
+        registration.setName(CAMEL_SERVLET_NAME);
+        return registration;
+    }
 
 }
