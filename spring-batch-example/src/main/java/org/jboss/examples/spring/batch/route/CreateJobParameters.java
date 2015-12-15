@@ -16,21 +16,20 @@
  */
 package org.jboss.examples.spring.batch.route;
 
-import org.apache.camel.builder.RouteBuilder;
-import org.springframework.stereotype.Component;
+import org.apache.camel.Header;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 
 /**
  * Created by ceposta 
  * <a href="http://christianposta.com/blog>http://christianposta.com/blog</a>.
  */
-@Component
-public class SampleRoute extends RouteBuilder{
-    @Override
-    public void configure() throws Exception {
-        from("file://target/data/input?noop=true&idempotent=true")
-                .log("New file to process ${header.CamelFileName}")
-                .bean(CreateJobParameters.class, "create")
-                .log("Params: ${body}")
-                .to("spring-batch:multilineJob");
+public class CreateJobParameters {
+
+    public JobParameters create(@Header("CamelFileName")String inputFile) {
+        JobParametersBuilder builder = new JobParametersBuilder();
+        builder.addString("inputFile", inputFile);
+        return builder.toJobParameters();
+
     }
 }

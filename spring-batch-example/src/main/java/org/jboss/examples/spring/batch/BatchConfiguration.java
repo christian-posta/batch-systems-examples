@@ -22,12 +22,14 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -61,11 +63,12 @@ public class BatchConfiguration {
 
     @Bean
     public Job job(Step step1) throws Exception {
-        return jobBuilderFactory.get("job1")
+        return jobBuilderFactory.get("multilineJob")
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .build();
     }
+
 
     @Bean
     public AggregateItemReader<AggregateItem<Trade>> reader(FlatFileItemReader flatFileItemReader){
@@ -83,9 +86,10 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public FlatFileItemReader<AggregateItem> flatFileItemReader(LineTokenizer lineTokenizer) {
+    @StepScope
+    public FlatFileItemReader<AggregateItem> flatFileItemReader(@Value("#{jobParameters[inputFile]}")String fileName, LineTokenizer lineTokenizer) {
         FlatFileItemReader<AggregateItem> rc = new FlatFileItemReader<>();
-        rc.setResource(new FileSystemResource("./src/main/data/multiline/teststream.multilineStep.txt"));
+        rc.setResource(new FileSystemResource(fileName));
         DefaultLineMapper<AggregateItem> mapper = new DefaultLineMapper<>();
 
         // tokenizer
