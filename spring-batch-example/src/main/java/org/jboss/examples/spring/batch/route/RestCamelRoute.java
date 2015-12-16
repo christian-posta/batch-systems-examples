@@ -29,23 +29,20 @@ public class RestCamelRoute extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         restConfiguration().component("servlet").bindingMode(RestBindingMode.json)
+                .contextPath("/camel")
+                .host("postamac.local")
+                .port(8080)
                 .apiContextPath("/api-doc")
                 .apiProperty("api.title", "User API")
                 .apiProperty("api.version", "1.2.3")
                 .apiProperty("api.description", "REST API for controlling the jobs")
                 .apiProperty("cors", "true")
-
-                // this doesn't seem to work correctly in camel-2.16.1 for camel-swagger-java
-                // opened a jira here https://issues.apache.org/jira/browse/CAMEL-9425
-                .apiProperty("base.path", "/camel")
-                .apiProperty("schemas", "http")
-                .apiProperty("host", "postamac.local")
         ;
 
-        rest().produces("application/json")
+        rest().produces("application/json").consumes("application/json")
                 .get("/hello")
                 .to("direct:foo");
 
-        from("direct:foo").transform(constant("Yay"));
+        from("direct:foo").transform(constant("{ \"response\": \"Yay\""));
     }
 }
